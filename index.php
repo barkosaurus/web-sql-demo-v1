@@ -35,7 +35,7 @@ if (!$result) {
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Moje SQL Projekty</h1>
+        <h1>Moje SQL Projekty</h1>
         <table>
             <thead>
                 <tr>
@@ -47,9 +47,9 @@ if (!$result) {
             <tbody>
                 <?php while($row = mysqli_fetch_assoc($result)): ?>
                 <tr>
-                    <td><strong><?= htmlspecialchars($row['názov']) ?></strong></td>
-                    <td><?= htmlspecialchars($row['technológia']) ?></td>
-                    <td><?= htmlspecialchars($row['rok']) ?></td>
+                    <td><strong><?= htmlspecialchars($row['nazov_projektu']) ?></strong></td>
+                    <td><?= htmlspecialchars($row['technologia']) ?></td>
+                    <td><?= htmlspecialchars($row['rok_vytvorenia']) ?></td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
