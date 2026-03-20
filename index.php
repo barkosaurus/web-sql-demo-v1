@@ -110,7 +110,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
     <div class="container">
         <header>
             <h1 id="main-title"><?php echo $current_title; ?></h1>
-            <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP with TiDB Cloud Engine</p>
+            <p style="color: var(--muted); letter-spacing: 1px;">PHP with TiDB Cloud Engine connection using DBeaver & Railway</p>
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
@@ -118,7 +118,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">DB Status</span></div>
         </section>
         <nav class="filters" id="filter-container">
-            <button class="filter-btn active" data-year="" onclick="loadData('')">Všetko</button>
+            <button class="filter-btn active" data-year="" onclick="loadData('')">Vše</button>
         </nav>
         <div class="table-wrapper">
             <div id="loader-overlay">Syncing...</div>
