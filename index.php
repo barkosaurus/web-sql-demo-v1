@@ -101,45 +101,126 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         </div>
     </div>
     <script>
+        // Constants
+        const STRINGS = {
+            ALL_PROJECTS: 'Všetko',
+            SYNCING: 'Syncing...',
+            CONNECTED: 'Connected',
+            OFFLINE: 'Offline',
+            NO_PROJECTS: 'No projects found',
+            ERROR_LOADING: 'Failed to load projects. Please try again.'
+        };
+
+        const TIMEOUT = 10000; // 10 seconds
+        let isLoading = false;
+
+        // Sanitize year parameter to prevent XSS
+        function sanitizeYear(year) {
+            if (!year) return '';
+            return String(year).replace(/[^0-9]/g, '');
+        }
+
+        // Fetch with timeout
+        function fetchWithTimeout(url, timeout = TIMEOUT) {
+            return Promise.race([
+                fetch(url),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), timeout)
+                )
+            ]);
+        }
+
+        // Disable/enable filter buttons
+        function setFiltersDisabled(disabled) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.disabled = disabled;
+                btn.style.opacity = disabled ? '0.5' : '1';
+                btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            });
+        }
+
         async function loadData(year) {
+            // Prevent multiple simultaneous requests
+            if (isLoading) return;
+            isLoading = true;
+            setFiltersDisabled(true);
+
             const loader = document.getElementById('loader-overlay');
             const tBody = document.getElementById('t-body');
             const mBody = document.getElementById('m-body');
             const filterContainer = document.getElementById('filter-container');
             const mainTitle = document.getElementById('main-title');
+
+            year = sanitizeYear(year);
             loader.style.display = 'flex';
+            loader.textContent = STRINGS.SYNCING;
+
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + (year ? '?year=' + year : '');
-            window.history.pushState({path:newUrl},'',newUrl);
+            window.history.pushState({path: newUrl}, '', newUrl);
             const titleText = year ? `JV portfolio | ${year}` : 'JV portfolio';
             document.title = titleText;
             mainTitle.textContent = titleText;
+
             try {
-                const res = await fetch(`api.php?year=${year}`);
+                const res = await fetchWithTimeout(`api.php?year=${year}`);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const result = await res.json();
+
                 document.getElementById('stat-count').textContent = result.count || 0;
                 document.getElementById('stat-year').textContent = result.latest_year || '-';
+
+                // Improved DB status with text + color
                 const dbStat = document.getElementById('stat-db');
-                dbStat.textContent = result.db_connected ? 'Connected' : 'Offline';
-                dbStat.style.color = result.db_connected ? 'var(--success)' : '#EF4444';
-                let filterHtml = `<button class="filter-btn ${year === '' ? 'active' : ''}" data-year="" onclick="loadData('')">Všetko</button>`;
-                if(result.available_years) {
+                const isConnected = result.db_connected;
+                dbStat.textContent = isConnected ? STRINGS.CONNECTED : STRINGS.OFFLINE;
+                dbStat.style.color = isConnected ? 'var(--success)' : '#EF4444';
+                dbStat.setAttribute('aria-label', `Database status: ${isConnected ? 'connected' : 'offline'}`);
+
+                // Build filter buttons without inline handlers
+                let filterHtml = `<button class="filter-btn ${year === '' ? 'active' : ''}" data-year="">` +
+                    `${STRINGS.ALL_PROJECTS}</button>`;
+                if (result.available_years) {
                     result.available_years.forEach(y => {
-                        filterHtml += `<button class="filter-btn ${String(year) === String(y) ? 'active' : ''}" data-year="${y}" onclick="loadData('${y}')">${y}</button>`;
+                        filterHtml += `<button class="filter-btn ${String(year) === String(y) ? 'active' : ''}" ` +
+                            `data-year="${y}">${y}</button>`;
                     });
                 }
                 filterContainer.innerHTML = filterHtml;
+
+                // Attach event listeners to filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => loadData(btn.dataset.year));
+                });
+
+                // Build project rows/cards
                 let tHtml = '';
                 let mHtml = '';
-                if(result.data) {
+                if (result.data && result.data.length > 0) {
                     result.data.forEach(p => {
                         tHtml += `<tr><td><div class="tooltip">${p.nazov_projektu}<svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="tt">${p.popis}</span></div></td><td><span class="badge">${p.technologia}</span></td><td style="color: var(--muted)">${p.rok_vytvorenia}</td></tr>`;
                         mHtml += `<div class="m-card"><strong style="color:#FFF">${p.nazov_projektu}</strong><p style="color:var(--muted); font-size:0.85rem; margin:10px 0; font-style:italic;">${p.popis}</p><span class="badge">${p.technologia}</span></div>`;
                     });
+                } else {
+                    tHtml = `<tr><td colspan="3" style="text-align:center; color:var(--muted)">${STRINGS.NO_PROJECTS}</td></tr>`;
+                    mHtml = `<div style="text-align:center; color:var(--muted); padding:40px 20px">${STRINGS.NO_PROJECTS}</div>`;
                 }
                 tBody.innerHTML = tHtml;
                 mBody.innerHTML = mHtml;
-            } catch (e) { console.error(e); } finally { loader.style.display = 'none'; }
+
+            } catch (e) {
+                console.error('Error loading data:', e);
+                const errorMsg = `<tr><td colspan="3" style="text-align:center; color:#EF4444">${STRINGS.ERROR_LOADING}</td></tr>`;
+                tBody.innerHTML = errorMsg;
+                mBody.innerHTML = `<div style="text-align:center; color:#EF4444; padding:40px 20px">${STRINGS.ERROR_LOADING}</div>`;
+            } finally {
+                loader.style.display = 'none';
+                isLoading = false;
+                setFiltersDisabled(false);
+            }
         }
+
+        // Initial load
         const urlParams = new URLSearchParams(window.location.search);
         loadData(urlParams.get('year') || '');
     </script>
