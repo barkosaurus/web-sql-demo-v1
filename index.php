@@ -85,8 +85,8 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
-            <div class="stat-card"><span class="stat-v" id="stat-year">-</span><span class="stat-l">Aktualizace</span></div>
-            <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">DB Status</span></div>
+            <div class="stat-card"><span class="stat-v" id="stat-year">-</span><span class="stat-l">Období</span></div>
+            <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">Stav DB    </span></div>
         </section>
         <nav class="filters" id="filter-container">
             <button class="filter-btn active" data-year="" onclick="loadData('')">Vše</button>
@@ -104,10 +104,10 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         const STRINGS = {
             ALL_PROJECTS: 'Vše',
             SYNCING: 'Načítávám data...',
-            CONNECTED: 'Connected',
-            OFFLINE: 'Offline',
-            NO_PROJECTS: 'No projects found',
-            ERROR_LOADING: 'Failed to load projects. Please try again.'
+            CONNECTED: 'Připojené',
+            OFFLINE: 'Odpojené',
+            NO_PROJECTS: 'Nenalezeny žádné projekty',
+            ERROR_LOADING: 'Chyba při načítání projektů. Zkuste to prosím znovu.'
         };
 
         const TIMEOUT = 10000;
