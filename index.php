@@ -64,24 +64,29 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             border-radius: 24px; 
             border: 1px solid var(--border); 
             position: relative; 
-            overflow: hidden;
+            overflow: visible; 
             min-height: 100px; 
         }
         table { width: 100%; border-collapse: collapse; border: none; }
         th { background: rgba(0,0,0,0.2); color: var(--accent); padding: 22px; text-align: left; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 20px; border-bottom: 1px solid var(--border); position: relative; }
-        tr:last-child td { border-bottom: none; }
         tr:hover td { background: var(--card-hover); }
+        
+        tr:last-child td { border-bottom: none; }
+        tr:last-child:hover td .tooltip .tt { border-bottom: 1px solid var(--accent); } 
+
         .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; cursor: help; }
         .info-icon { width: 16px; height: 16px; margin-left: 10px; color: var(--accent); flex-shrink: 0; }
+        
         .tooltip .tt { 
             visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); 
             color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; 
-            top: 120%; left: 0; opacity: 0; transition: 0.2s; z-index: 100; 
+            bottom: 130%; left: 0; opacity: 0; transition: 0.2s; z-index: 100; 
             font-size: 0.85rem; font-style: italic; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             pointer-events: none;
         }
-        .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(5px); }
+        .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(-5px); }
+        
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
         #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; border-radius: 24px; }
         .mobile-cards { display: none; }
@@ -110,7 +115,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
     <div class="container">
         <header>
             <h1 id="main-title"><?php echo $current_title; ?></h1>
-            <p style="color: var(--muted); letter-spacing: 1px;">PHP with TiDB Cloud Engine connection using DBeaver & Railway</p>
+            <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP with TiDB Cloud Engine</p>
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
@@ -118,7 +123,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">DB Status</span></div>
         </section>
         <nav class="filters" id="filter-container">
-            <button class="filter-btn active" data-year="" onclick="loadData('')">Vše</button>
+            <button class="filter-btn active" data-year="" onclick="loadData('')">Všetko</button>
         </nav>
         <div class="table-wrapper">
             <div id="loader-overlay">Syncing...</div>
