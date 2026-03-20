@@ -38,9 +38,27 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         .stat-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
         .stat-v { display: block; font-size: 1.8rem; font-weight: 700; color: #FFF; }
         .stat-l { font-size: 0.7rem; text-transform: uppercase; color: var(--muted); letter-spacing: 2px; margin-top: 8px; display: block; }
-        .filters { display: flex; justify-content: center; gap: 12px; margin-bottom: 35px; flex-wrap: wrap; }
-        .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 10px 22px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
+        
+        .filters { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 35px; 
+            flex-wrap: wrap; 
+        }
+        .filter-btn { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            color: var(--muted); 
+            padding: 10px 22px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
         .filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+
         .table-wrapper { 
             background: var(--card); 
             border-radius: 24px; 
@@ -67,12 +85,21 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
         #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; border-radius: 24px; }
         .mobile-cards { display: none; }
+
         @media (max-width: 600px) {
             .status-bar { grid-template-areas: "a b" "c c"; grid-template-columns: 1fr 1fr; }
             .stat-card:nth-child(1) { grid-area: a; }
             .stat-card:nth-child(2) { grid-area: b; }
             .stat-card:nth-child(3) { grid-area: c; max-width: 200px; margin: auto; width: 100%; }
-            .filters { justify-content: center; }
+            
+            .filters { 
+                display: grid; 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 8px; 
+                padding: 0 5px;
+            }
+            .filter-btn { padding: 10px 5px; text-align: center; font-size: 0.8rem; }
+
             .desktop-table { display: none; }
             .mobile-cards { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
             .m-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 18px; }
