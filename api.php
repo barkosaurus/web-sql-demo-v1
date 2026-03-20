@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: application/json');
+
+$start_time = microtime(true);
+
 $host = getenv('DB_HOST');
 $port = (int)getenv('DB_PORT'); 
 $user = getenv('DB_USER');
@@ -11,6 +14,7 @@ mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
 $is_connected = @mysqli_real_connect($conn, $host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$is_connected) {
+    http_response_code(500);
     echo json_encode(['db_connected' => false]);
     exit;
 }
@@ -22,6 +26,7 @@ while($yr = mysqli_fetch_assoc($years_res)) {
 }
 
 $filter_year = isset($_GET['year']) && $_GET['year'] !== '' ? (int)$_GET['year'] : null;
+$query_type = $filter_year ? "FILTER_YEAR" : "ALL_PROJECTS";
 
 if ($filter_year) {
     $stmt = mysqli_prepare($conn, "SELECT * FROM moje_projekty WHERE rok_vytvorenia = ? ORDER BY rok_vytvorenia DESC");
@@ -39,6 +44,14 @@ while($row = mysqli_fetch_assoc($result)) {
     $projects[] = $row;
     if($row['rok_vytvorenia'] > $latest) $latest = $row['rok_vytvorenia'];
 }
+
+$execution_time = round((microtime(true) - $start_time) * 1000, 2);
+$ip = $_SERVER['REMOTE_ADDR'];
+
+$log_stmt = mysqli_prepare($conn, "INSERT INTO query_logs (visitor_ip, query_type, execution_time_ms) VALUES (?, ?, ?)");
+mysqli_stmt_bind_param($log_stmt, "ssd", $ip, $query_type, $execution_time);
+mysqli_stmt_execute($log_stmt);
+mysqli_stmt_close($log_stmt);
 
 echo json_encode([
     'db_connected' => true,
