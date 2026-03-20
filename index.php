@@ -44,15 +44,20 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         .filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
 
         .table-wrapper { position: relative; overflow: visible; min-height: 100px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border-radius: 24px; border: 1px solid var(--border); overflow: visible; }
         th { background: rgba(0,0,0,0.2); color: var(--accent); padding: 22px; text-align: left; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        th:first-child { border-top-left-radius: 24px; }
+        th:last-child { border-top-right-radius: 24px; }
+        tr:first-child th { border-top: 1px solid var(--border); }
         td { padding: 20px; border-bottom: 1px solid var(--border); position: relative; }
         tr:hover td { background: var(--card-hover); }
         tr:last-child td { border-bottom: none; }
+        tr:last-child td:first-child { border-bottom-left-radius: 24px; }
+        tr:last-child td:last-child { border-bottom-right-radius: 24px; }
 
         .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; cursor: help; }
         .info-icon { width: 16px; height: 16px; margin-left: 10px; color: var(--accent); flex-shrink: 0; }
-        .tooltip .tt { visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; bottom: 130%; left: 0; opacity: 0; transition: 0.2s; z-index: 100; font-size: 0.85rem; font-style: italic; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none; }
+        .tooltip .tt { visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; bottom: 130%; left: 0; opacity: 0; transition: 0.2s; z-index: 10000; font-size: 0.85rem; font-style: italic; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none; }
         .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(-5px); }
         
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
