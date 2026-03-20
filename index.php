@@ -72,6 +72,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             .stat-card:nth-child(1) { grid-area: a; }
             .stat-card:nth-child(2) { grid-area: b; }
             .stat-card:nth-child(3) { grid-area: c; max-width: 200px; margin: auto; width: 100%; }
+            .filters { justify-content: center; }
             .desktop-table { display: none; }
             .mobile-cards { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
             .m-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 18px; }
