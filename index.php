@@ -8,21 +8,25 @@ $dbname = getenv('DB_NAME');
 $conn = mysqli_init();
 mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
 
-if (!mysqli_real_connect($conn, $host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL)) {
-    die();
-}
+$is_connected = @mysqli_real_connect($conn, $host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL);
 
-$sql = "SELECT * FROM moje_projekty ORDER BY rok_vytvorenia DESC";
-$result = mysqli_query($conn, $sql);
-
-$total_projects = mysqli_num_rows($result);
-$latest_year = 0;
-$all_projects = [];
-
-while($row = mysqli_fetch_assoc($result)) {
-    $all_projects[] = $row;
-    if ($row['rok_vytvorenia'] > $latest_year) {
-        $latest_year = $row['rok_vytvorenia'];
+if (!$is_connected) {
+    $db_status = "Offline";
+    $status_color = "#EF4444";
+    $total_projects = 0;
+    $latest_year = "-";
+    $all_projects = [];
+} else {
+    $db_status = "Connected";
+    $status_color = "#10B981";
+    $sql = "SELECT * FROM moje_projekty ORDER BY rok_vytvorenia DESC";
+    $result = mysqli_query($conn, $sql);
+    $total_projects = mysqli_num_rows($result);
+    $all_projects = [];
+    $latest_year = 0;
+    while($row = mysqli_fetch_assoc($result)) {
+        $all_projects[] = $row;
+        if ($row['rok_vytvorenia'] > $latest_year) $latest_year = $row['rok_vytvorenia'];
     }
 }
 ?>
@@ -40,7 +44,6 @@ while($row = mysqli_fetch_assoc($result)) {
             --bg-color: #0F172A;
             --card-bg: #1E293B;
             --accent-color: #818CF8;
-            --accent-hover: #A5B4FC;
             --text-main: #E2E8F0;
             --text-muted: #94A3B8;
             --hover-row: #2D3748;
@@ -52,7 +55,6 @@ while($row = mysqli_fetch_assoc($result)) {
             color: var(--text-main); 
             padding: 40px 20px; 
             margin: 0;
-            line-height: 1.6;
         }
 
         .container { 
@@ -76,7 +78,6 @@ while($row = mysqli_fetch_assoc($result)) {
             font-size: 2.8rem;
             color: #FFFFFF;
             margin: 0;
-            letter-spacing: -1px;
         }
 
         .status-bar {
@@ -92,21 +93,31 @@ while($row = mysqli_fetch_assoc($result)) {
             border-radius: 12px;
             border: 1px solid #334155;
             text-align: center;
-            min-width: 150px;
+            min-width: 160px;
         }
 
         .stat-value {
-            display: block;
-            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: var(--accent-color);
+            gap: 8px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 1px;
+            display: block;
+            margin-top: 4px;
         }
 
         .table-wrapper {
@@ -114,36 +125,27 @@ while($row = mysqli_fetch_assoc($result)) {
             border-radius: 16px; 
             border: 1px solid #334155;
             overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         }
 
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
+        table { width: 100%; border-collapse: collapse; }
 
         th { 
             background: #161E2E;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.8rem;
-            letter-spacing: 1px;
             color: var(--accent-color);
             padding: 20px; 
             text-align: left; 
         }
 
-        td { 
-            padding: 20px; 
-            border-bottom: 1px solid #334155; 
-        }
+        td { padding: 20px; border-bottom: 1px solid #334155; }
 
         tr:hover td { background-color: var(--hover-row); }
 
         .project-name {
             font-weight: 600;
             color: #FFFFFF;
-            font-size: 1.05rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -153,13 +155,12 @@ while($row = mysqli_fetch_assoc($result)) {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border: 1px solid var(--accent-color);
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 10px;
             color: var(--accent-color);
-            cursor: help;
         }
 
         .tech-badge {
@@ -167,11 +168,11 @@ while($row = mysqli_fetch_assoc($result)) {
             color: var(--accent-color);
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border: 1px solid rgba(129, 140, 248, 0.2);
         }
 
-        .tooltip { position: relative; display: inline-block; }
+        .tooltip { position: relative; cursor: help; }
 
         .tooltip .tooltiptext {
             visibility: hidden;
@@ -185,18 +186,15 @@ while($row = mysqli_fetch_assoc($result)) {
             bottom: 140%;
             left: 0;
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s ease;
             border: 1px solid var(--accent-color);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-style: italic;
         }
 
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
-            transform: translateY(0) scale(1);
         }
     </style>
 </head>
@@ -204,20 +202,23 @@ while($row = mysqli_fetch_assoc($result)) {
     <div class="container">
         <header>
             <h1>Data Engineering Portfolio</h1>
-            <p style="color: var(--text-muted);">Live pripojenie na TiDB Cloud via PHP 8.4</p>
+            <p style="color: var(--text-muted);">PHP 8.4 & TiDB Cloud Connection</p>
         </header>
 
         <div class="status-bar">
             <div class="stat-card">
-                <span class="stat-value"><?= $total_projects ?></span>
-                <span class="stat-label">Projekty</span>
+                <span class="stat-value" style="color: #FFFFFF;"><?= $total_projects ?></span>
+                <span class="stat-label">Total Projects</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value"><?= $latest_year ?></span>
-                <span class="stat-label">Posledný update</span>
+                <span class="stat-value" style="color: #FFFFFF;"><?= $latest_year ?></span>
+                <span class="stat-label">Last Updated</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value">Active</span>
+                <span class="stat-value" style="color: <?= $status_color ?>;">
+                    <span class="status-dot" style="background-color: <?= $status_color ?>;"></span>
+                    <?= $db_status ?>
+                </span>
                 <span class="stat-label">Database Status</span>
             </div>
         </div>
@@ -226,9 +227,9 @@ while($row = mysqli_fetch_assoc($result)) {
             <table>
                 <thead>
                     <tr>
-                        <th>Názov projektu</th>
-                        <th>Použitá technológia</th>
-                        <th>Rok</th>
+                        <th>Project Name</th>
+                        <th>Stack</th>
+                        <th>Year</th>
                     </tr>
                 </thead>
                 <tbody>
