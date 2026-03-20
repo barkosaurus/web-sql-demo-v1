@@ -55,10 +55,10 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         tr:last-child td:first-child { border-bottom-left-radius: 24px; }
         tr:last-child td:last-child { border-bottom-right-radius: 24px; }
 
-        .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; cursor: help; }
-        .info-icon { width: 16px; height: 16px; margin-left: 10px; color: var(--accent); flex-shrink: 0; }
+        .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; }
+        .info-icon { width: 16px; height: 16px; margin-left: 10px; color: var(--accent); flex-shrink: 0; cursor: help; }
         .tooltip .tt { visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; bottom: 130%; left: 0; opacity: 0; transition: 0.2s; z-index: 10000; font-size: 0.85rem; font-style: italic; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none; }
-        .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(-5px); }
+        .info-icon:hover ~ .tt { visibility: visible; opacity: 1; transform: translateY(-5px); }
         
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
         #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; border-radius: 24px; }
@@ -101,7 +101,6 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         </div>
     </div>
     <script>
-        // Constants
         const STRINGS = {
             ALL_PROJECTS: 'Všetko',
             SYNCING: 'Syncing...',
@@ -111,16 +110,14 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             ERROR_LOADING: 'Failed to load projects. Please try again.'
         };
 
-        const TIMEOUT = 10000; // 10 seconds
+        const TIMEOUT = 10000;
         let isLoading = false;
 
-        // Sanitize year parameter to prevent XSS
         function sanitizeYear(year) {
             if (!year) return '';
             return String(year).replace(/[^0-9]/g, '');
         }
 
-        // Fetch with timeout
         function fetchWithTimeout(url, timeout = TIMEOUT) {
             return Promise.race([
                 fetch(url),
@@ -130,7 +127,6 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             ]);
         }
 
-        // Disable/enable filter buttons
         function setFiltersDisabled(disabled) {
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
@@ -141,7 +137,6 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
         }
 
         async function loadData(year) {
-            // Prevent multiple simultaneous requests
             if (isLoading) return;
             isLoading = true;
             setFiltersDisabled(true);
@@ -170,14 +165,12 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
                 document.getElementById('stat-count').textContent = result.count || 0;
                 document.getElementById('stat-year').textContent = result.latest_year || '-';
 
-                // Improved DB status with text + color
                 const dbStat = document.getElementById('stat-db');
                 const isConnected = result.db_connected;
                 dbStat.textContent = isConnected ? STRINGS.CONNECTED : STRINGS.OFFLINE;
                 dbStat.style.color = isConnected ? 'var(--success)' : '#EF4444';
                 dbStat.setAttribute('aria-label', `Database status: ${isConnected ? 'connected' : 'offline'}`);
 
-                // Build filter buttons without inline handlers
                 let filterHtml = `<button class="filter-btn ${year === '' ? 'active' : ''}" data-year="">` +
                     `${STRINGS.ALL_PROJECTS}</button>`;
                 if (result.available_years) {
@@ -188,12 +181,10 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
                 }
                 filterContainer.innerHTML = filterHtml;
 
-                // Attach event listeners to filter buttons
                 document.querySelectorAll('.filter-btn').forEach(btn => {
                     btn.addEventListener('click', () => loadData(btn.dataset.year));
                 });
 
-                // Build project rows/cards
                 let tHtml = '';
                 let mHtml = '';
                 if (result.data && result.data.length > 0) {
@@ -220,7 +211,6 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             }
         }
 
-        // Initial load
         const urlParams = new URLSearchParams(window.location.search);
         loadData(urlParams.get('year') || '');
     </script>
