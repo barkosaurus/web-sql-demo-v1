@@ -1,9 +1,15 @@
+<?php
+$title_suffix = "Portfolio";
+if(isset($_GET['year']) && $_GET['year'] != "") {
+    $title_suffix = "Projekty " . htmlspecialchars($_GET['year']);
+}
+?>
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barkosaurus SQL Portfolio</title>
+    <title>Barkosaurus | <?php echo $title_suffix; ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -59,7 +65,7 @@
         }
         .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(5px); }
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
-        #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; }
+        #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; border-radius: 24px; }
         .mobile-cards { display: none; }
         @media (max-width: 600px) {
             .status-bar { grid-template-areas: "a b" "c c"; grid-template-columns: 1fr 1fr; }
@@ -76,7 +82,7 @@
     <div class="container">
         <header>
             <h1>Barkosaurus SQL Portfolio</h1>
-            <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP Engine • TiDB Cloud</p>
+            <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP with TiDB Cloud Engine</p>
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
@@ -84,10 +90,10 @@
             <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">DB Status</span></div>
         </section>
         <nav class="filters" id="filter-container">
-            <button class="filter-btn active" data-year="" onclick="loadData('')">Vše</button>
+            <button class="filter-btn active" data-year="" onclick="loadData('')">Všetko</button>
         </nav>
         <div class="table-wrapper">
-            <div id="loader-overlay">Synchronizace dat...</div>
+            <div id="loader-overlay">Syncing...</div>
             <table class="desktop-table">
                 <thead><tr><th>Projekt</th><th>Stack</th><th>Rok</th></tr></thead>
                 <tbody id="t-body"></tbody>
@@ -102,6 +108,10 @@
             const mBody = document.getElementById('m-body');
             const filterContainer = document.getElementById('filter-container');
             loader.style.display = 'flex';
+            
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + (year ? '?year=' + year : '');
+            window.history.pushState({path:newUrl},'',newUrl);
+
             try {
                 const res = await fetch(`api.php?year=${year}`);
                 const result = await res.json();
@@ -110,13 +120,15 @@
                 const dbStat = document.getElementById('stat-db');
                 dbStat.textContent = result.db_connected ? 'Connected' : 'Offline';
                 dbStat.style.color = result.db_connected ? 'var(--success)' : '#EF4444';
-                let filterHtml = `<button class="filter-btn ${year === '' ? 'active' : ''}" data-year="" onclick="loadData('')">Vše</button>`;
+                
+                let filterHtml = `<button class="filter-btn ${year === '' ? 'active' : ''}" data-year="" onclick="loadData('')">Všetko</button>`;
                 if(result.available_years) {
                     result.available_years.forEach(y => {
                         filterHtml += `<button class="filter-btn ${String(year) === String(y) ? 'active' : ''}" data-year="${y}" onclick="loadData('${y}')">${y}</button>`;
                     });
                 }
                 filterContainer.innerHTML = filterHtml;
+                
                 let tHtml = '';
                 let mHtml = '';
                 if(result.data) {
@@ -129,7 +141,8 @@
                 mBody.innerHTML = mHtml;
             } catch (e) { console.error(e); } finally { loader.style.display = 'none'; }
         }
-        loadData('');
+        const urlParams = new URLSearchParams(window.location.search);
+        loadData(urlParams.get('year') || '');
     </script>
 </body>
 </html>
