@@ -10,6 +10,7 @@
             --bg: #0D0F14; 
             --bg-gradient: radial-gradient(circle at top center, #1C1F26 0%, #0D0F14 100%);
             --card: #161B22; 
+            --card-hover: #1C2128;
             --accent: #8B5CF6; 
             --text: #F8FAFC; 
             --muted: #94A3B8;
@@ -34,11 +35,21 @@
         .filters { display: flex; justify-content: center; gap: 12px; margin-bottom: 35px; flex-wrap: wrap; }
         .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 10px 22px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
         .filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
-        .table-wrapper { background: var(--card); border-radius: 24px; border: 1px solid var(--border); position: relative; min-height: 300px; }
-        table { width: 100%; border-collapse: collapse; }
+        .table-wrapper { 
+            background: var(--card); 
+            border-radius: 24px; 
+            border: 1px solid var(--border); 
+            position: relative; 
+            overflow: hidden;
+            min-height: 100px; 
+        }
+        table { width: 100%; border-collapse: collapse; border: none; }
         th { background: rgba(0,0,0,0.2); color: var(--accent); padding: 22px; text-align: left; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 20px; border-bottom: 1px solid var(--border); position: relative; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--card-hover); }
         .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; cursor: help; }
+        .info-icon { width: 16px; height: 16px; margin-left: 10px; color: var(--accent); flex-shrink: 0; }
         .tooltip .tt { 
             visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); 
             color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; 
@@ -47,8 +58,8 @@
             pointer-events: none;
         }
         .tooltip:hover .tt { visibility: visible; opacity: 1; transform: translateY(5px); }
-        .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); }
-        #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; border-radius: 24px; color: var(--accent); font-weight: 600; }
+        .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); flex-shrink: 0; }
+        #loader-overlay { display: none; position: absolute; inset: 0; background: rgba(13, 15, 20, 0.7); backdrop-filter: blur(4px); z-index: 20; justify-content: center; align-items: center; color: var(--accent); font-weight: 600; }
         .mobile-cards { display: none; }
         @media (max-width: 600px) {
             .status-bar { grid-template-areas: "a b" "c c"; grid-template-columns: 1fr 1fr; }
