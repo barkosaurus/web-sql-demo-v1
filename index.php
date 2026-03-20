@@ -1,7 +1,7 @@
 <?php
-$title_suffix = "Portfolio";
+$current_title = "JV portfolio";
 if(isset($_GET['year']) && $_GET['year'] != "") {
-    $title_suffix = "Projekty " . htmlspecialchars($_GET['year']);
+    $current_title = "JV portfolio | " . htmlspecialchars($_GET['year']);
 }
 ?>
 <!DOCTYPE html>
@@ -9,7 +9,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barkosaurus | <?php echo $title_suffix; ?></title>
+    <title><?php echo $current_title; ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -81,7 +81,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
 <body>
     <div class="container">
         <header>
-            <h1>Barkosaurus SQL Portfolio</h1>
+            <h1 id="main-title"><?php echo $current_title; ?></h1>
             <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP with TiDB Cloud Engine</p>
         </header>
         <section class="status-bar">
@@ -107,10 +107,15 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             const tBody = document.getElementById('t-body');
             const mBody = document.getElementById('m-body');
             const filterContainer = document.getElementById('filter-container');
+            const mainTitle = document.getElementById('main-title');
             loader.style.display = 'flex';
             
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + (year ? '?year=' + year : '');
             window.history.pushState({path:newUrl},'',newUrl);
+            
+            const titleText = year ? `JV portfolio | ${year}` : 'JV portfolio';
+            document.title = titleText;
+            mainTitle.textContent = titleText;
 
             try {
                 const res = await fetch(`api.php?year=${year}`);
