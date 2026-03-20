@@ -81,7 +81,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
     <div class="container">
         <header>
             <h1 id="main-title"><?php echo $current_title; ?></h1>
-            <p style="color: var(--muted); letter-spacing: 1px;">Full-stack PHP with TiDB Cloud Engine</p>
+            <p style="color: var(--muted); letter-spacing: 1px;">DBeaver • TiDB Cloud • PHP • Railway</p>
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
@@ -89,10 +89,10 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
             <div class="stat-card"><span class="stat-v" id="stat-db">...</span><span class="stat-l">DB Status</span></div>
         </section>
         <nav class="filters" id="filter-container">
-            <button class="filter-btn active" data-year="" onclick="loadData('')">Všetko</button>
+            <button class="filter-btn active" data-year="" onclick="loadData('')">Vše</button>
         </nav>
         <div class="table-wrapper">
-            <div id="loader-overlay">Syncing...</div>
+            <div id="loader-overlay">Načítávám data...</div>
             <table class="desktop-table">
                 <thead><tr><th>Projekt</th><th>Stack</th><th>Rok</th></tr></thead>
                 <tbody id="t-body"></tbody>
@@ -102,8 +102,8 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
     </div>
     <script>
         const STRINGS = {
-            ALL_PROJECTS: 'Všetko',
-            SYNCING: 'Syncing...',
+            ALL_PROJECTS: 'Vše',
+            SYNCING: 'Načítávám data...',
             CONNECTED: 'Connected',
             OFFLINE: 'Offline',
             NO_PROJECTS: 'No projects found',
