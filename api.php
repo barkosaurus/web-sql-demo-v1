@@ -15,6 +15,12 @@ if (!$is_connected) {
     exit;
 }
 
+$years_res = mysqli_query($conn, "SELECT DISTINCT rok_vytvorenia FROM moje_projekty ORDER BY rok_vytvorenia DESC");
+$available_years = [];
+while($yr = mysqli_fetch_assoc($years_res)) {
+    $available_years[] = $yr['rok_vytvorenia'];
+}
+
 $filter_year = isset($_GET['year']) && $_GET['year'] !== '' ? (int)$_GET['year'] : null;
 
 if ($filter_year) {
@@ -38,6 +44,7 @@ echo json_encode([
     'db_connected' => true,
     'count' => count($projects),
     'latest_year' => $latest ?: '-',
+    'available_years' => $available_years,
     'data' => $projects
 ]);
 
