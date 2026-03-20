@@ -11,7 +11,7 @@ mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
 $is_connected = @mysqli_real_connect($conn, $host, $user, $pass, $dbname, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$is_connected) {
-    echo json_encode(['error' => 'Connection failed']);
+    echo json_encode(['db_connected' => false]);
     exit;
 }
 
@@ -27,11 +27,19 @@ if ($filter_year) {
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $projects = [];
+$latest = 0;
 
 while($row = mysqli_fetch_assoc($result)) {
     $projects[] = $row;
+    if($row['rok_vytvorenia'] > $latest) $latest = $row['rok_vytvorenia'];
 }
 
-echo json_encode($projects);
+echo json_encode([
+    'db_connected' => true,
+    'count' => count($projects),
+    'latest_year' => $latest ?: '-',
+    'data' => $projects
+]);
+
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
