@@ -45,7 +45,7 @@
         .stat-v { display: block; font-size: 1.8rem; font-weight: 700; color: #FFF; }
         .stat-l { font-size: 0.7rem; text-transform: uppercase; color: var(--muted); letter-spacing: 2px; margin-top: 8px; display: block; }
         .filters { display: flex; justify-content: center; gap: 12px; margin-bottom: 35px; }
-        .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 12px 28px; border-radius: 14px; cursor: pointer; transition: 0.3s; }
+        .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 12px 28px; border-radius: 14px; cursor: pointer; transition: 0.3s; border: 1px solid var(--border); }
         .filter-btn.active { background: var(--accent); color: #FFF; border-color: var(--accent); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
         .table-wrapper { 
             background: var(--card); 
@@ -53,18 +53,30 @@
             border: 1px solid var(--border); 
             overflow: hidden; 
             position: relative;
+            min-height: 300px;
         }
         table { width: 100%; border-collapse: collapse; }
         th { background: rgba(0,0,0,0.2); color: var(--accent); padding: 22px; text-align: left; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 20px; border-bottom: 1px solid var(--border); }
         .info-icon { width: 16px; height: 16px; vertical-align: middle; margin-left: 8px; color: var(--accent); opacity: 0.7; }
-        .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; }
-        .tooltip .tt { visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; bottom: 140%; left: 0; opacity: 0; transition: 0.3s; z-index: 10; font-size: 0.85rem; font-weight: 400; }
+        .tooltip { position: relative; display: inline-flex; align-items: center; color: #FFF; font-weight: 500; cursor: help; }
+        .tooltip .tt { visibility: hidden; width: 280px; background: #1C2128; border: 1px solid var(--accent); color: var(--muted); padding: 15px; border-radius: 12px; position: absolute; bottom: 140%; left: 0; opacity: 0; transition: 0.3s; z-index: 10; font-size: 0.85rem; font-weight: 400; font-style: italic; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .tooltip:hover .tt { visibility: visible; opacity: 1; }
         .badge { background: rgba(139, 92, 246, 0.1); color: #C084FC; padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.2); }
-        #loader { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 600; }
+        #loader-overlay { 
+            display: none; 
+            position: absolute; 
+            inset: 0; 
+            background: rgba(13, 15, 20, 0.7); 
+            backdrop-filter: blur(4px);
+            z-index: 20; 
+            justify-content: center; 
+            align-items: center; 
+            color: var(--accent); 
+            font-weight: 600; 
+            font-size: 1.1rem;
+        }
         .mobile-cards { display: none; }
-
         @media (max-width: 600px) {
             .status-bar { grid-template-areas: "a b" "c c"; grid-template-columns: 1fr 1fr; }
             .stat-card:nth-child(1) { grid-area: a; }
@@ -93,8 +105,8 @@
             <button class="filter-btn" data-year="2026" onclick="loadData('2026')">2026</button>
         </nav>
         <div class="table-wrapper">
-            <div id="loader">Syncing...</div>
-            <table class="desktop-table" id="d-table">
+            <div id="loader-overlay">Syncing Data...</div>
+            <table class="desktop-table">
                 <thead><tr><th>Projekt</th><th>Stack</th><th>Rok</th></tr></thead>
                 <tbody id="t-body"></tbody>
             </table>
@@ -103,10 +115,10 @@
     </div>
     <script>
         async function loadData(year) {
-            const loader = document.getElementById('loader');
+            const loader = document.getElementById('loader-overlay');
             const tBody = document.getElementById('t-body');
             const mBody = document.getElementById('m-body');
-            loader.style.display = 'block';
+            loader.style.display = 'flex';
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-year') === String(year));
             });
@@ -118,13 +130,12 @@
                 const dbStat = document.getElementById('stat-db');
                 dbStat.textContent = result.db_connected ? 'Connected' : 'Offline';
                 dbStat.style.color = result.db_connected ? 'var(--success)' : '#EF4444';
-
                 let tHtml = '';
                 let mHtml = '';
                 if(result.data) {
                     result.data.forEach(p => {
                         tHtml += `<tr><td><div class="tooltip">${p.nazov_projektu}<svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="tt">${p.popis}</span></div></td><td><span class="badge">${p.technologia}</span></td><td style="color: var(--muted)">${p.rok_vytvorenia}</td></tr>`;
-                        mHtml += `<div class="m-card"><strong style="color:#FFF">${p.nazov_projektu}</strong><p style="color:var(--muted); font-size:0.85rem; margin:10px 0">${p.popis}</p><span class="badge">${p.technologia}</span></div>`;
+                        mHtml += `<div class="m-card"><strong style="color:#FFF">${p.nazov_projektu}</strong><p style="color:var(--muted); font-size:0.85rem; margin:10px 0; font-style:italic;">${p.popis}</p><span class="badge">${p.technologia}</span></div>`;
                     });
                 }
                 tBody.innerHTML = tHtml;
