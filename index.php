@@ -81,7 +81,7 @@ if(isset($_GET['year']) && $_GET['year'] != "") {
     <div class="container">
         <header>
             <h1 id="main-title"><?php echo $current_title; ?></h1>
-            <p style="color: var(--muted); letter-spacing: 1px;">DBeaver • TiDB Cloud • PHP • HTML/CSS • Railway</p>
+            <p style="color: var(--muted); letter-spacing: 1px;">DBeaver • TiDB Cloud • SQL • PHP • HTML/CSS • Railway</p>
         </header>
         <section class="status-bar">
             <div class="stat-card"><span class="stat-v" id="stat-count">0</span><span class="stat-l">Projekty</span></div>
